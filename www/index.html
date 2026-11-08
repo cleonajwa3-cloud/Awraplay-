@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050914">
+<title>AwraPlay</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:22px 18px 110px;
+ background:#050914;color:#f5f9ff;
+ font-family:Arial,sans-serif
+}
+header{display:flex;align-items:center;gap:12px}
+.logo{
+ width:46px;height:46px;border-radius:15px;
+ background:linear-gradient(135deg,#087cff,#07152d);
+ display:grid;place-items:center;
+ box-shadow:0 0 20px #168cff66;
+ font-size:28px;color:#fff
+}
+.brand{font-size:23px;font-weight:bold}
+.brand span{color:#35caff}
+small,.muted{color:#8397b4}
+h1{font-size:29px;line-height:1.3}
+h3{font-size:17px}
+.search{
+ width:100%;padding:15px;margin:20px 0;
+ border:1px solid #24476e;border-radius:14px;
+ background:#101b30;color:white;font-size:15px
+}
+.feature{
+ padding:22px;border-radius:22px;
+ background:linear-gradient(135deg,#124b83,#091326);
+ border:1px solid #168cff;
+ box-shadow:0 0 20px #087cff22
+}
+.feature h2{font-size:24px}
+button{
+ border:0;border-radius:12px;padding:12px;
+ background:#087cff;color:white;font-weight:bold
+}
+.primary{
+ background:linear-gradient(90deg,#087cff,#35caff);
+ color:#041323;border-radius:30px
+}
+.grid{
+ display:grid;grid-template-columns:1fr 1fr;gap:12px
+}
+.tile{
+ background:#101d32;border:1px solid #1e3c60;
+ border-radius:17px;padding:17px
+}
+.tile div{font-size:26px;color:#42caff}
+.tile b{display:block;margin-top:12px}
+.song{
+ display:flex;align-items:center;gap:12px;
+ padding:12px 0;border-bottom:1px solid #1a2a43
+}
+.art{
+ width:48px;height:48px;border-radius:12px;
+ display:grid;place-items:center;
+ background:linear-gradient(135deg,#087cff,#10223d);
+ font-size:23px;flex-shrink:0
+}
+.info{flex:1;min-width:0}
+.info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.info small{font-size:11px}
+.iconbtn{background:none;color:#50caff;font-size:20px;padding:8px}
+.page{display:none}
+.page.active{display:block}
+.mini{
+ position:fixed;bottom:72px;left:12px;right:12px;
+ background:#13243c;border:1px solid #168cff;
+ border-radius:15px;padding:10px;
+ display:flex;align-items:center;gap:10px;
+ z-index:5
+}
+.mini .info{flex:1}
+nav{
+ position:fixed;bottom:0;left:0;right:0;
+ height:65px;background:#080f1e;
+ border-top:1px solid #20334e;
+ display:flex;justify-content:space-around;align-items:center;
+ z-index:6
+}
+nav button{background:none;color:#8397b4;padding:8px;font-size:11px}
+nav button.active{color:#42caff}
+#fileInput{display:none}
+#playerPage{text-align:center;padding-top:25px}
+.cover{
+ width:min(75vw,270px);aspect-ratio:1;
+ margin:30px auto;border-radius:28px;
+ display:grid;place-items:center;font-size:100px;
+ background:linear-gradient(145deg,#087cff,#08152b);
+ box-shadow:0 0 40px #087cff55
+}
+.controls{display:flex;justify-content:center;gap:20px;margin:25px}
+.controls button{font-size:23px}
+textarea{
+ width:100%;background:#101b30;color:white;
+ border:1px solid #24476e;border-radius:14px;padding:14px
+}
+.empty{color:#8397b4;padding:22px 0;font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">♫</div>
+ <div class="brand">Awra<span>Play</span></div>
+</header>
+
+<main>
+<section id="home" class="page active">
+ <p style="color:#42caff;margin-top:35px">WELCOME TO AWRAPLAY</p>
+ <h1>Feel your music.<br>Feel your world.</h1>
+ <p class="muted">Musik favoritmu, kapan saja.</p>
+
+ <input class="search" id="search" placeholder="⌕  Cari lagu...">
+
+ <div class="feature">
+  <small>YOUR PERSONAL MUSIC SPACE</small>
+  <h2>Let the music<br>take you away.</h2>
+  <p class="muted">Nikmati koleksi musikmu.</p>
+  <button class="primary" onclick="document.getElementById('fileInput').click()">+ Tambah Musik</button>
+ </div>
+
+ <h3>Your collection</h3>
+ <div class="grid">
+  <div class="tile" onclick="page('favorites')">
+   <div>♥</div><b>Favorites</b><small>Lagu kesukaan</small>
+  </div>
+  <div class="tile" onclick="page('library')">
+   <div>♫</div><b>My Library</b><small>Koleksi musik</small>
+  </div>
+ </div>
+
+ <h3>Recently added</h3>
+ <div id="homeSongs"></div>
+</section>
+
+<section id="library" class="page">
+ <h1>My Library</h1>
+ <p class="muted">Semua musik kamu.</p>
+ <button class="primary" onclick="document.getElementById('fileInput').click()">+ Tambah Musik</button>
+ <div id="librarySongs"></div>
+</section>
+
+<section id="favorites" class="page">
+ <h1>Favorites ♥</h1>
+ <p class="muted">Musik favoritmu.</p>
+ <div id="favoriteSongs"></div>
+</section>
+
+<section id="playerPage" class="page">
+ <small>NOW PLAYING</small>
+ <div class="cover">♫</div>
+ <h2 id="playerTitle">Belum ada lagu</h2>
+ <p class="muted">AwraPlay Music</p>
+ <audio id="audio" controls style="width:100%"></audio>
+ <div class="controls">
+  <button onclick="previous()">⏮</button>
+  <button onclick="togglePlay()">▶ / ⏸</button>
+  <button onclick="next()">⏭</button>
+ </div>
+ <button onclick="page('lyrics')">Lihat Lirik ♪</button>
+</section>
+
+<section id="lyrics" class="page">
+ <h1>Lyrics ♪</h1>
+ <p id="lyricSong" class="muted">Pilih lagu terlebih dahulu.</p>
+ <textarea id="lyricText" rows="12" placeholder="Masukkan lirik lagu..."></textarea>
+ <br><br>
+ <button class="primary" onclick="saveLyrics()">Simpan Lirik</button>
+</section>
+</main>
+
+<input id="fileInput" type="file" accept="audio/*" multiple>
+
+<div class="mini" onclick="page('playerPage')">
+ <div class="art">♫</div>
+ <div class="info">
+  <b id="miniTitle">Belum ada musik</b>
+  <small>AwraPlay</small>
+ </div>
+ <button class="iconbtn" onclick="event.stopPropagation();togglePlay()">▶</button>
+</div>
+
+<nav>
+ <button class="active" onclick="page('home',this)">⌂<br>Home</button>
+ <button onclick="page('library',this)">♫<br>Library</button>
+ <button onclick="page('favorites',this)">♥<br>Favorite</button>
+ <button onclick="page('lyrics',this)">≋<br>Lyrics</button>
+</nav>
+
+<script>
+let songs=[];
+let current=-1;
+let favorites=JSON.parse(localStorage.favorites||"[]");
+let lyrics=JSON.parse(localStorage.lyrics||"{}");
+let db;
+
+const audio=document.getElementById("audio");
+const request=indexedDB.open("AwraPlayDB",1);
+
+request.onupgradeneeded=e=>{
+ e.target.result.createObjectStore("songs",{keyPath:"id"});
+};
+
+request.onsuccess=e=>{
+ db=e.target.result;
+ db.transaction("songs").objectStore("songs").getAll().onsuccess=ev=>{
+  songs=ev.target.result;
+  render();
+ };
+};
+
+function addSong(file){
+ const song={id:Date.now()+Math.random(),name:file.name,blob:file};
+ db.transaction("songs","readwrite").objectStore("songs").put(song).onsuccess=()=>{
+  songs.push(song);
+  render();
+ };
+}
+
+document.getElementById("fileInput").onchange=e=>{
+ [...e.target.files].forEach(addSong);
+ e.target.value="";
+};
+
+function page(id,btn){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+ if(btn)btn.classList.add("active");
+ if(id==="lyrics")showLyrics();
+}
+
+function playSong(id){
+ current=songs.findIndex(x=>x.id===id);
+ if(current<0)return;
+ audio.src=URL.createObjectURL(songs[current].blob);
+ document.getElementById("playerTitle").textContent=songs[current].name;
+ document.getElementById("miniTitle").textContent=songs[current].name;
+ audio.play().catch(()=>{});
+ showLyrics();
+ page("playerPage");
+}
+
+function togglePlay(){
+ if(!audio.src)return;
+ if(audio.paused)audio.play();else audio.pause();
+}
+
+function next(){
+ if(songs.length)playSong(songs[(current+1)%songs.length].id);
+}
+
+function previous(){
+ if(songs.length)playSong(songs[(current-1+songs.length)%songs.length].id);
+}
+
+function toggleFavorite(id){
+ favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];
+ localStorage.favorites=JSON.stringify(favorites);
+ render();
+}
+
+function makeSong(s){
+ const row=document.createElement("div");
+ row.className="song";
+ const art=document.createElement("div");
+ art.className="art";art.textContent="♫";
+ const info=document.createElement("div");
+ info.className="info";
+ const name=document.createElement("b");
+ name.textContent=s.name;
+ const sub=document.createElement("small");
+ sub.textContent="Local music";
+ info.append(name,sub);
+ const fav=document.createElement("button");
+ fav.className="iconbtn";
+ fav.textContent=favorites.includes(s.id)?"♥":"♡";
+ fav.onclick=()=>toggleFavorite(s.id);
+ const play=document.createElement("button");
+ play.className="iconbtn";play.textContent="▶";
+ play.onclick=()=>playSong(s.id);
+ row.append(art,info,fav,play);
+ return row;
+}
+
+function render(){
+ const q=document.getElementById("search").value.toLowerCase();
+ const filtered=songs.filter(s=>s.name.toLowerCase().includes(q));
+ const sets={
+  homeSongs:filtered.slice(-4).reverse(),
+  librarySongs:filtered,
+  favoriteSongs:filtered.filter(s=>favorites.includes(s.id))
+ };
+ for(const [id,list] of Object.entries(sets)){
+  const box=document.getElementById(id);
+  box.replaceChildren();
+  list.forEach(s=>box.append(makeSong(s)));
+  if(!list.length){
+   const empty=document.createElement("div");
+   empty.className="empty";
+   empty.textContent="Belum ada lagu. Tambahkan musik dari HP kamu.";
+   box.append(empty);
+  }
+ }
+}
+
+document.getElementById("search").oninput=render;
+
+function saveLyrics(){
+ if(current<0)return alert("Pilih lagu dahulu.");
+ lyrics[songs[current].id]=document.getElementById("lyricText").value;
+ localStorage.lyrics=JSON.stringify(lyrics);
+ alert("Lirik berhasil disimpan!");
+}
+
+function showLyrics(){
+ if(current<0)return;
+ document.getElementById("lyricSong").textContent=songs[current].name;
+ document.getElementById("lyricText").value=lyrics[songs[current].id]||"";
+}
+
+audio.onended=next;
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AwraPlay</string>
+    <string name="title_activity_main">AwraPlay</string>
+    <string name="package_name">com.awraplay.music</string>
+    <string name="custom_url_scheme">com.awraplay.music</string>
+</resources>
